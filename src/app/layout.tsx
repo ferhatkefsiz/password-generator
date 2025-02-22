@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { cx } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -12,7 +13,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="antialiased">
+    <html
+      lang="en"
+      className={cx(
+        "antialiased",
+        "selection:bg-zinc-700 selection:text-zinc-100 dark:selection:bg-zinc-100 dark:selection:text-zinc-700"
+      )}
+    >
       <body>{children}</body>
     </html>
   );
