@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useCallback, useState } from "react";
 import { Card } from "@/components/Card";
 import { Divider } from "@/components/Divider";
 import {
@@ -14,8 +14,41 @@ import { Slider } from "@/components/Slider";
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
 
+const generatePassword = (
+  length: number,
+  includeNumbers: boolean,
+  includeSymbols: boolean
+): string => {
+  const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const numbers = "0123456789";
+  const symbols = "!@#$%^&*()_+{}[]|:;<>,.?/~";
+
+  let characters = letters;
+  if (includeNumbers) characters += numbers;
+  if (includeSymbols) characters += symbols;
+
+  return Array.from(
+    { length },
+    () => characters[Math.floor(Math.random() * characters.length)]
+  ).join("");
+};
+
 export default function Home() {
-  const [value, setValue] = React.useState([20]);
+  const [length, setLength] = useState([20]);
+  const [includeNumbers, setIncludeNumbers] = useState(true);
+  const [includeSymbols, setIncludeSymbols] = useState(false);
+  const [password, setPassword] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyPassword = useCallback(() => {
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+    navigator.clipboard.writeText(password);
+  }, [password]);
+
+  const handleRefreshPassword = useCallback(() => {
+    setPassword(generatePassword(length[0], includeNumbers, includeSymbols));
+  }, [includeNumbers, includeSymbols, length]);
 
   return (
     <div className="flex items-center justify-center min-h-screen p-4 bg-gray-100 dark:bg-gray-900">
@@ -47,9 +80,9 @@ export default function Home() {
               <form
                 onSubmit={(event) => {
                   // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-                  event.preventDefault(), alert("Submitted: " + `${value[0]}`);
+                  event.preventDefault(), alert("Submitted: " + `${length[0]}`);
                 }}
-                onReset={() => setValue([55, 75])}
+                onReset={() => setLength([55, 75])}
               >
                 <div className="flex items-center gap-8">
                   <div className="flex items-center space-x-3">
@@ -58,10 +91,14 @@ export default function Home() {
                     </span>
                   </div>
 
-                  <Slider id="a" value={value} onValueChange={setValue} />
+                  <Slider
+                    id="a"
+                    value={length}
+                    onValueChange={(val) => setLength(val)}
+                  />
 
                   <span className="ml-1 font-semibold text-gray-900 dark:text-gray-50 text-xs font-mono">
-                    ({value[0]})
+                    ({length[0]})
                   </span>
 
                   <Input
@@ -80,7 +117,12 @@ export default function Home() {
                     >
                       Numbers <span className="sr-only">Numbers</span>
                     </label>
-                    <Switch id="upgrade-1" name="upgrade-1" />
+                    <Switch
+                      id="upgrade-1"
+                      name="upgrade-1"
+                      checked={includeNumbers}
+                      onCheckedChange={setIncludeNumbers}
+                    />
                   </div>
 
                   <div className="flex items-center space-x-3">
@@ -90,7 +132,12 @@ export default function Home() {
                     >
                       Symbols <span className="sr-only">Symbols</span>
                     </label>
-                    <Switch id="upgrade-2" name="upgrade-2" />
+                    <Switch
+                      id="upgrade-2"
+                      name="upgrade-2"
+                      checked={includeSymbols}
+                      onCheckedChange={setIncludeSymbols}
+                    />
                   </div>
                 </div>
                 <Divider />
@@ -107,15 +154,21 @@ export default function Home() {
               </p>
             </TabsContent>
 
-            <div className="my-4 text-gray-200 text-sm">Generated Password</div>
-            <Card>
-              <p className="text-center">
-                <code>{"FJK*LoBzmWYPR*uxCtHZ@>>ftZ]X"}</code>
-              </p>
+            <div className="my-4 text-gray-500 dark:text-gray-400 text-sm">
+              Generated Password
+            </div>
+
+            <Card className="text-center">
+              <code className="break-all">{password}</code>
             </Card>
+
             <div className="grid grid-cols-2 items-center gap-2 mt-4">
-              <Button>Copy Password</Button>
-              <Button variant="light">Refresh Password</Button>
+              <Button onClick={handleCopyPassword}>
+                {copied ? "Copied!" : "Copy Password"}
+              </Button>
+              <Button onClick={handleRefreshPassword} variant="light">
+                Refresh Password
+              </Button>
             </div>
           </div>
         </Tabs>
