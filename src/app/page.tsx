@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Card } from "@/components/Card";
 import { Divider } from "@/components/Divider";
 import {
@@ -17,9 +17,9 @@ import { Input } from "@/components/Input";
 const generatePassword = (
   length: number,
   includeNumbers: boolean,
-  includeSymbols: boolean
+  includeSymbols: boolean,
 ): string => {
-  const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQxqRSTUVWXYZ";
   const numbers = "0123456789";
   const symbols = "!@#$%^&*()_+{}[]|:;<>,.?/~";
 
@@ -29,7 +29,7 @@ const generatePassword = (
 
   return Array.from(
     { length },
-    () => characters[Math.floor(Math.random() * characters.length)]
+    () => characters[Math.floor(Math.random() * characters.length)],
   ).join("");
 };
 
@@ -40,6 +40,10 @@ export default function Home() {
   const [password, setPassword] = useState("");
   const [copied, setCopied] = useState(false);
 
+  useEffect(() => {
+    setPassword(generatePassword(length[0], includeNumbers, includeSymbols));
+  }, [length, includeNumbers, includeSymbols]);
+
   const handleCopyPassword = useCallback(() => {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -49,6 +53,11 @@ export default function Home() {
   const handleRefreshPassword = useCallback(() => {
     setPassword(generatePassword(length[0], includeNumbers, includeSymbols));
   }, [includeNumbers, includeSymbols, length]);
+
+  const handleLengthChange = (val: number[]) => {
+    setLength(val);
+    setPassword(generatePassword(val[0], includeNumbers, includeSymbols));
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen p-4 bg-gray-100 dark:bg-gray-900">
@@ -92,20 +101,16 @@ export default function Home() {
                   </div>
 
                   <Slider
-                    id="a"
+                    id="length"
                     value={length}
-                    onValueChange={(val) => setLength(val)}
+                    onValueChange={handleLengthChange}
+                    min={8}
+                    max={100}
                   />
 
-                  <span className="ml-1 font-semibold text-gray-900 dark:text-gray-50 text-xs font-mono">
-                    ({length[0]})
+                  <span className="ml-1 select-none font-semibold text-gray-900 dark:text-gray-50 text-xs font-mono dark:bg-gray-800/80 bg-gray-200/50 py-2 px-4 rounded">
+                    {length[0]}
                   </span>
-
-                  <Input
-                    id="pw-length"
-                    name="pw-length"
-                    className="mt-2 w-36"
-                  />
                 </div>
 
                 <Divider />
@@ -158,7 +163,7 @@ export default function Home() {
               Generated Password
             </div>
 
-            <Card className="text-center">
+            <Card className="text-center min-h-20 items-center justify-center flex">
               <code className="break-all">{password}</code>
             </Card>
 
