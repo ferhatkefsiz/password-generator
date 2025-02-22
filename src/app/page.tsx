@@ -9,9 +9,10 @@ import {
   RiShuffleLine,
 } from "@remixicon/react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/Tabs";
-import { Switch } from "@/components/Switch";
-import { Slider } from "@/components/Slider";
 import { Button } from "@/components/Button";
+
+import RandomPassword from "@/modules/generators/RandomPassword";
+import PasswordVisualizer from "@/modules/PasswordVisualizer";
 
 import { generatePassword } from "@/lib/generatePassword";
 
@@ -36,7 +37,7 @@ export default function Home() {
     setPassword(generatePassword(length[0], includeNumbers, includeSymbols));
   }, [includeNumbers, includeSymbols, length]);
 
-  const handleLengthChange = (val: number[]) => {
+  const onLengthChange = (val: number[]) => {
     setLength(val);
     setPassword(generatePassword(val[0], includeNumbers, includeSymbols));
   };
@@ -48,9 +49,9 @@ export default function Home() {
           Choose password type
         </h3>
 
-        <Tabs defaultValue="tab1" className="mt-4">
+        <Tabs defaultValue="random-password" className="mt-4">
           <TabsList variant="solid" className="w-full grid grid-cols-3">
-            <TabsTrigger value="tab1" className="gap-1.5 py-1.5">
+            <TabsTrigger value="random-password" className="gap-1.5 py-1.5">
               <RiShuffleLine className="-ml-1 size-4" aria-hidden="true" />
               Random
             </TabsTrigger>
@@ -67,69 +68,17 @@ export default function Home() {
           <Divider>Customize your new password</Divider>
 
           <div className="mt-4">
-            <TabsContent value="tab1">
-              <form
-                onSubmit={(event) => {
-                  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-                  event.preventDefault(), alert("Submitted: " + `${length[0]}`);
-                }}
-                onReset={() => setLength([55, 75])}
-              >
-                <div className="flex items-center gap-8">
-                  <div className="flex items-center space-x-3">
-                    <span className="dark:text-gray-400 text-sm select-none">
-                      Characters
-                    </span>
-                  </div>
-
-                  <Slider
-                    id="length"
-                    value={length}
-                    onValueChange={handleLengthChange}
-                    min={8}
-                    max={100}
-                  />
-
-                  <span className="ml-1 select-none font-semibold text-gray-900 dark:text-gray-50 text-xs font-mono dark:bg-gray-800/80 bg-gray-200/50 py-2 px-4 rounded">
-                    {length[0]}
-                  </span>
-                </div>
-
-                <Divider />
-                <div className="flex items-center gap-8">
-                  <div className="flex items-center space-x-3">
-                    <label
-                      htmlFor="upgrade-1"
-                      className="dark:text-gray-400 text-sm select-none"
-                    >
-                      Numbers <span className="sr-only">Numbers</span>
-                    </label>
-                    <Switch
-                      id="upgrade-1"
-                      name="upgrade-1"
-                      checked={includeNumbers}
-                      onCheckedChange={setIncludeNumbers}
-                    />
-                  </div>
-
-                  <div className="flex items-center space-x-3">
-                    <label
-                      htmlFor="upgrade-2"
-                      className="dark:text-gray-400 text-sm select-none"
-                    >
-                      Symbols <span className="sr-only">Symbols</span>
-                    </label>
-                    <Switch
-                      id="upgrade-2"
-                      name="upgrade-2"
-                      checked={includeSymbols}
-                      onCheckedChange={setIncludeSymbols}
-                    />
-                  </div>
-                </div>
-                <Divider />
-              </form>
+            <TabsContent value="random-password">
+              <RandomPassword
+                length={length[0]}
+                includeNumbers={includeNumbers}
+                includeSymbols={includeSymbols}
+                onLengthChange={onLengthChange}
+                onIncludeNumbersChange={setIncludeNumbers}
+                onIncludeSymbolsChange={setIncludeSymbols}
+              />
             </TabsContent>
+
             <TabsContent value="tab2">
               <p className="text-sm text-gray-500 sm:text-gray-500">
                 Tab 2 content
@@ -146,7 +95,7 @@ export default function Home() {
             </div>
 
             <Card className="text-center min-h-20 items-center justify-center flex">
-              <code className="break-all">{password}</code>
+              <PasswordVisualizer password={password} />
             </Card>
 
             <div className="grid grid-cols-2 items-center gap-2 mt-4">
