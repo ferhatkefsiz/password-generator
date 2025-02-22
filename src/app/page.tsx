@@ -12,29 +12,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/Tabs";
 import { Switch } from "@/components/Switch";
 import { Slider } from "@/components/Slider";
 import { Button } from "@/components/Button";
-import { Input } from "@/components/Input";
 
-const generatePassword = (
-  length: number,
-  includeNumbers: boolean,
-  includeSymbols: boolean,
-): string => {
-  const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQxqRSTUVWXYZ";
-  const numbers = "0123456789";
-  const symbols = "!@#$%^&*()_+{}[]|:;<>,.?/~";
-
-  let characters = letters;
-  if (includeNumbers) characters += numbers;
-  if (includeSymbols) characters += symbols;
-
-  return Array.from(
-    { length },
-    () => characters[Math.floor(Math.random() * characters.length)],
-  ).join("");
-};
+import { generatePassword } from "@/lib/generatePassword";
 
 export default function Home() {
-  const [length, setLength] = useState([20]);
+  const [length, setLength] = useState([14]);
   const [includeNumbers, setIncludeNumbers] = useState(true);
   const [includeSymbols, setIncludeSymbols] = useState(false);
   const [password, setPassword] = useState("");
