@@ -1,46 +1,102 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+
 import { Card } from "@/components/Card";
 import { Divider } from "@/components/Divider";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/Tabs";
+import { Button } from "@/components/Button";
+
+import RandomPassword from "@/modules/generators/RandomPassword";
+import MemorablePassword from "@/modules/generators/MemorablePassword";
+import PinPassword from "@/modules/generators/PinPassword";
+import PasswordVisualizer from "@/modules/PasswordVisualizer";
+
+import {
+  generateMemorablePassword,
+  generatePinPassword,
+  generateRandomPassword,
+} from "@/lib/generatePassword";
+
 import {
   RiLightbulbLine,
   RiLockPasswordLine,
   RiShuffleLine,
 } from "@remixicon/react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/Tabs";
-import { Button } from "@/components/Button";
-
-import RandomPassword from "@/modules/generators/RandomPassword";
-import PasswordVisualizer from "@/modules/PasswordVisualizer";
-
-import { generatePassword } from "@/lib/generatePassword";
 
 export default function Home() {
-  const [length, setLength] = useState([14]);
-  const [includeNumbers, setIncludeNumbers] = useState(true);
-  const [includeSymbols, setIncludeSymbols] = useState(false);
-  const [password, setPassword] = useState("");
+  const [activeTab, setActiveTab] = useState("random-password");
   const [copied, setCopied] = useState(false);
 
+  const defaultLengths = useMemo(
+    () => ({
+      random: 14,
+      memorable: 4,
+      pin: 6,
+    }),
+    [],
+  );
+
+  const [lengths, setLengths] = useState(defaultLengths);
+
+  // Settings for Random PW
+  const [includeNumbers, setIncludeNumbers] = useState(true);
+  const [includeSymbols, setIncludeSymbols] = useState(true);
+
+  // Settings for Memorable PW
+  const [capitalizeFirstLetter, setCapitalizeFirstLetter] = useState(true);
+  const [useFullWords, setUseFullWords] = useState(true);
+
+  const [password, setPassword] = useState("");
+
+  // Generating pw based on active tab
+  const generatePassword = useCallback(() => {
+    const key = activeTab.split("-")[0] as keyof typeof lengths;
+
+    const length = lengths[key];
+
+    if (activeTab === "random-password") {
+      return generateRandomPassword(length, includeNumbers, includeSymbols);
+    } else if (activeTab === "memorable-password") {
+      return generateMemorablePassword(
+        length,
+        capitalizeFirstLetter,
+        useFullWords,
+      );
+    } else if (activeTab === "pin-password") {
+      return generatePinPassword(length);
+    }
+
+    return "";
+  }, [
+    activeTab,
+    lengths,
+    includeNumbers,
+    includeSymbols,
+    capitalizeFirstLetter,
+    useFullWords,
+  ]);
+
   useEffect(() => {
-    setPassword(generatePassword(length[0], includeNumbers, includeSymbols));
-  }, [length, includeNumbers, includeSymbols]);
+    setPassword(generatePassword());
+  }, [generatePassword]);
+
+  const handleRefreshPassword = useCallback(() => {
+    setPassword(generatePassword());
+  }, [generatePassword]);
+
+  const handleLengthChange = (
+    type: keyof typeof defaultLengths,
+    value: number,
+  ) => {
+    setLengths((prev) => ({ ...prev, [type]: value }));
+  };
 
   const handleCopyPassword = useCallback(() => {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
     navigator.clipboard.writeText(password);
   }, [password]);
-
-  const handleRefreshPassword = useCallback(() => {
-    setPassword(generatePassword(length[0], includeNumbers, includeSymbols));
-  }, [includeNumbers, includeSymbols, length]);
-
-  const onLengthChange = (val: number[]) => {
-    setLength(val);
-    setPassword(generatePassword(val[0], includeNumbers, includeSymbols));
-  };
 
   return (
     <div className="flex items-center justify-center min-h-screen p-4 bg-gray-100 dark:bg-gray-900">
@@ -49,19 +105,29 @@ export default function Home() {
           Choose password type
         </h3>
 
-        <Tabs defaultValue="random-password" className="mt-4">
+        <Tabs
+          className="mt-4"
+          defaultValue="random-password"
+          value={activeTab}
+          onValueChange={(val) => {
+            setActiveTab(val);
+            setPassword(generatePassword()); // Update password when tab changes
+          }}
+        >
           <TabsList variant="solid" className="w-full grid grid-cols-3">
             <TabsTrigger value="random-password" className="gap-1.5 py-1.5">
-              <RiShuffleLine className="-ml-1 size-4" aria-hidden="true" />
-              Random
+              <RiShuffleLine className="whitespace-nowrap -ml-1 min-w-4 size-4" aria-hidden="true" />
+              <span className="text-xs">Random</span>
             </TabsTrigger>
-            <TabsTrigger value="tab2" className="gap-1.5 py-1.5">
-              <RiLightbulbLine className="-ml-1 size-4" aria-hidden="true" />
-              Memorable
+
+            <TabsTrigger value="memorable-password" className="gap-1.5 py-1.5">
+              <RiLightbulbLine className="whitespace-nowrap -ml-1 min-w-4 size-4" aria-hidden="true" />
+              <span className="text-xs">Memorable</span>
             </TabsTrigger>
-            <TabsTrigger value="tab3" className="gap-1.5 py-1.5">
-              <RiLockPasswordLine className="-ml-1 size-4" aria-hidden="true" />
-              Pin
+
+            <TabsTrigger value="pin-password" className="gap-1.5 py-1.5">
+              <RiLockPasswordLine className="whitespace-nowrap -ml-1 min-w-4 size-4" aria-hidden="true" />
+              <span className="text-xs">Pin</span>
             </TabsTrigger>
           </TabsList>
 
@@ -70,31 +136,38 @@ export default function Home() {
           <div className="mt-4">
             <TabsContent value="random-password">
               <RandomPassword
-                length={length[0]}
+                length={lengths.random}
                 includeNumbers={includeNumbers}
                 includeSymbols={includeSymbols}
-                onLengthChange={onLengthChange}
+                onLengthChange={(val) => handleLengthChange("random", val[0])}
                 onIncludeNumbersChange={setIncludeNumbers}
                 onIncludeSymbolsChange={setIncludeSymbols}
               />
             </TabsContent>
 
-            <TabsContent value="tab2">
-              <p className="text-sm text-gray-500 sm:text-gray-500">
-                Tab 2 content
-              </p>
+            <TabsContent value="memorable-password">
+              <MemorablePassword
+                length={lengths.memorable}
+                setLength={(val) => handleLengthChange("memorable", val[0])}
+                capitalizeFirstLetter={capitalizeFirstLetter}
+                setCapitalizeFirstLetter={setCapitalizeFirstLetter}
+                useFullWords={useFullWords}
+                setUseFullWords={setUseFullWords}
+              />
             </TabsContent>
-            <TabsContent value="tab3">
-              <p className="text-sm text-gray-500 sm:text-gray-500">
-                Tab 3 content
-              </p>
+
+            <TabsContent value="pin-password">
+              <PinPassword
+                length={lengths.pin}
+                handleLengthChange={(val) => handleLengthChange("pin", val[0])}
+              />
             </TabsContent>
 
             <div className="my-4 text-gray-500 dark:text-gray-400 text-sm">
               Generated Password
             </div>
 
-            <Card className="text-center min-h-20 items-center justify-center flex">
+            <Card className="text-center min-h-20 items-center justify-center flex flex-col">
               <PasswordVisualizer password={password} />
             </Card>
 
