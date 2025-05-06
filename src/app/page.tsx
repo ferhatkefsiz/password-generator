@@ -99,7 +99,7 @@ export default function Home() {
   }, [password]);
 
   return (
-    <div className="flex items-center justify-center min-h-screen p-4 bg-gray-100 dark:bg-gray-900">
+    <div className="flex items-center justify-center p-4 mt-auto">
       <Card className="mx-auto max-w-lg">
         <h3 className="font-semibold text-gray-900 dark:text-gray-50">
           Choose password type
@@ -115,17 +115,17 @@ export default function Home() {
           }}
         >
           <TabsList variant="solid" className="w-full grid grid-cols-3">
-            <TabsTrigger value="random-password" className="gap-1.5 py-1.5">
+            <TabsTrigger value="random-password" className="gap-1.5 py-2">
               <RiShuffleLine className="whitespace-nowrap -ml-1 min-w-4 size-4" aria-hidden="true" />
               <span className="text-xs">Random</span>
             </TabsTrigger>
 
-            <TabsTrigger value="memorable-password" className="gap-1.5 py-1.5">
+            <TabsTrigger value="memorable-password" className="gap-1.5 py-2">
               <RiLightbulbLine className="whitespace-nowrap -ml-1 min-w-4 size-4" aria-hidden="true" />
               <span className="text-xs">Memorable</span>
             </TabsTrigger>
 
-            <TabsTrigger value="pin-password" className="gap-1.5 py-1.5">
+            <TabsTrigger value="pin-password" className="gap-1.5 py-2">
               <RiLockPasswordLine className="whitespace-nowrap -ml-1 min-w-4 size-4" aria-hidden="true" />
               <span className="text-xs">Pin</span>
             </TabsTrigger>
@@ -175,7 +175,7 @@ export default function Home() {
               <Button onClick={handleCopyPassword}>
                 {copied ? "Copied!" : "Copy Password"}
               </Button>
-              <Button onClick={handleRefreshPassword} variant="light">
+              <Button onClick={handleRefreshPassword} variant="secondary">
                 Refresh Password
               </Button>
             </div>

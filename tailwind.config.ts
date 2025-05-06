@@ -7,6 +7,7 @@ const config: Config = {
     "./src/modules/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/lib/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  darkMode: "class",
   theme: {
     extend: {
       fontFamily: {

@@ -23,7 +23,7 @@ export default function RandomPassword({
     <div>
       <div className="flex items-center gap-8">
         <div className="flex items-center space-x-3">
-          <span className="dark:text-gray-400 text-sm select-none">
+          <span className="dark:text-gray-400 text-gray-500 text-sm select-none">
             Characters
           </span>
         </div>
@@ -46,7 +46,7 @@ export default function RandomPassword({
         <div className="flex items-center space-x-3">
           <label
             htmlFor="numbers"
-            className="dark:text-gray-400 text-sm select-none"
+            className="dark:text-gray-400 text-gray-500 text-sm select-none"
           >
             Numbers
           </label>
@@ -60,7 +60,7 @@ export default function RandomPassword({
         <div className="flex items-center space-x-3">
           <label
             htmlFor="symbols"
-            className="dark:text-gray-400 text-sm select-none"
+            className="dark:text-gray-400 text-gray-500 text-sm select-none"
           >
             Symbols
           </label>

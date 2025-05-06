@@ -22,7 +22,7 @@ export default function MemorablePassword({
   return (
     <div>
       <div className="flex items-center gap-8">
-        <span className="dark:text-gray-400 text-sm select-none">
+        <span className="dark:text-gray-400 text-gray-500 text-sm select-none">
           Characters
         </span>
 
@@ -45,7 +45,7 @@ export default function MemorablePassword({
         <div className="flex items-center space-x-3">
           <label
             htmlFor="capitalize-first-letter"
-            className="dark:text-gray-400 text-sm select-none"
+            className="dark:text-gray-400 text-gray-500 text-sm select-none"
           >
             Capitalize the first letter
           </label>
@@ -58,7 +58,7 @@ export default function MemorablePassword({
         <div className="flex items-center space-x-3">
           <label
             htmlFor="full-words"
-            className="dark:text-gray-400 text-sm select-none"
+            className="dark:text-gray-400 text-gray-500 text-sm select-none"
           >
             Use full words
           </label>
